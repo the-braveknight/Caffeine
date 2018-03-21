@@ -55,12 +55,12 @@ class FileBrowserViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateColorMode), name: .colorModeChanged, object: nil)
         
         updateColorMode()
-        updateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+        updateUI()
     }
     
     @objc func updateColorMode() {
