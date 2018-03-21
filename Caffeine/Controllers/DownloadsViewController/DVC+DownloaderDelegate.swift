@@ -14,7 +14,7 @@ extension DownloadsViewController: DownloaderDelegate {
         DispatchQueue.main.async {
             self.showAlert(title: "Downlad Complete", message: "\(download.name) was downloaded successfully.")
             self.tableView.reloadData()
-            self.updateUI()
+            self.updateLabels()
         }
     }
     
@@ -22,7 +22,7 @@ extension DownloadsViewController: DownloaderDelegate {
         print("Failed to download \(download.name) with error: \(error.localizedDescription)")
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            self.updateUI()
+            self.updateLabels()
             self.handle(error: error)
         }
     }
@@ -31,7 +31,7 @@ extension DownloadsViewController: DownloaderDelegate {
         print("DownloaderDelegate: Starting \(download.name).")
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            self.updateUI()
+            self.updateLabels()
         }
     }
 }

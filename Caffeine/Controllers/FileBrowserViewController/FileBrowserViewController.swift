@@ -53,14 +53,11 @@ class FileBrowserViewController: UITableViewController {
         editButtonItem.image = #imageLiteral(resourceName: "edit")
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateColorMode), name: .colorModeChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFileSaved), name: .fileSaved, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFileDeleted), name: .fileDeleted, object: nil)
         
         updateColorMode()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        tableView.reloadData()
-        updateUI()
+        updateLabels()
     }
     
     @objc func updateColorMode() {
@@ -88,14 +85,27 @@ class FileBrowserViewController: UITableViewController {
         cell.shareButton.tintColor = Settings.colorMode.tintColor
     }
     
+    func updateLabels() {
+        noContentsLabel.isHidden = !files.isEmpty
+        editButtonItem.isEnabled = !files.isEmpty
+    }
+    
     @objc func share(sender: UIButton) {
         let file = files[sender.tag]
         let activityController = UIActivityViewController(activityItems: [file.url], applicationActivities: nil)
         present(activityController, animated: true)
     }
     
-    func updateUI() {
-        noContentsLabel.isHidden = !files.isEmpty
-        editButtonItem.isEnabled = !files.isEmpty
+    @objc func handleFileSaved() {
+        DispatchQueue.main.async {
+            self.updateLabels()
+            self.tableView.reloadData()
+        }
+    }
+    
+    @objc func handleFileDeleted() {
+        DispatchQueue.main.async {
+            self.updateLabels()
+        }
     }
 }

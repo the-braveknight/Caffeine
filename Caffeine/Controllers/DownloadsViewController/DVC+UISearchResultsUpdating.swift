@@ -24,6 +24,6 @@ extension DownloadsViewController: UISearchResultsUpdating, UISearchControllerDe
     func updateSearchResults(for searchController: UISearchController) {
         filteredDownloads = downloader.downloads.filter { $0.name.lowercased().contains(searchController.searchBar.text!.lowercased()) }
         tableView.reloadData()
-        updateUI()
+        updateLabels()
     }
 }

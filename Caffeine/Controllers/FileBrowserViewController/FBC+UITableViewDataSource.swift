@@ -21,7 +21,6 @@ extension FileBrowserViewController {
         let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
             let file = self.file(forRowAt: indexPath)
             file.delete()
-            self.updateUI()
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
         

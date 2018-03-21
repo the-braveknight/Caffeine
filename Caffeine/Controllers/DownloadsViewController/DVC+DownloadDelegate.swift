@@ -29,7 +29,7 @@ extension DownloadsViewController: DownloadDelegate {
             cell?.button.isSelected = state == .running
             cell?.progressBar.progressTintColor = Settings.colorMode.progressTintColor(forState: state)
             
-            self.updateUI()
+            self.updateLabels()
         }
     }
     

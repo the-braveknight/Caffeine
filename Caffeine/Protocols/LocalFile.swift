@@ -27,6 +27,7 @@ extension LocalFile {
     
     func delete() {
         try? FileManager.default.removeItem(at: url)
+        NotificationCenter.default.post(name: .fileDeleted, object: self)
     }
     
     static func saveItem(at tempPath: URL, fileName: String, handler: ((Self?, Error?) -> Void)? = nil) {
@@ -35,6 +36,7 @@ extension LocalFile {
             try FileManager.default.moveItem(at: tempPath, to: newPath)
             let file = Self(url: newPath)
             handler?(file, nil)
+            NotificationCenter.default.post(name: .fileSaved, object: file)
         } catch {
             handler?(nil, error)
         }
@@ -57,4 +59,9 @@ extension String {
     var fileExtension: String {
         return URL(fileURLWithPath: self).pathExtension
     }
+}
+
+extension Notification.Name {
+    static let fileDeleted = Notification.Name(rawValue: "FileDeleted")
+    static let fileSaved = Notification.Name(rawValue: "FileSaved")
 }

@@ -81,7 +81,7 @@ class DownloadsViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateColorMode), name: .colorModeChanged, object: nil)
         
         updateColorMode()
-        updateUI()
+        updateLabels()
     }
     
     override func didReceiveMemoryWarning() {
@@ -172,7 +172,7 @@ class DownloadsViewController: UITableViewController {
         present(alert, animated: true)
     }
     
-    func updateUI() {
+    func updateLabels() {
         editButtonItem.isEnabled = !downloads.isEmpty
         noDownloadsLabel.isHidden = !downloads.isEmpty
     }

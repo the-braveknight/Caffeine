@@ -16,7 +16,7 @@ extension FileBrowserViewController: UISearchResultsUpdating, UISearchController
     func updateSearchResults(for searchController: UISearchController) {
         filteredFiles = MXFile.savedFiles.filter { $0.name.lowercased().contains(searchController.searchBar.text!.lowercased()) }
         tableView.reloadData()
-        updateUI()
+        updateLabels()
     }
     
     func willPresentSearchController(_ searchController: UISearchController) {
