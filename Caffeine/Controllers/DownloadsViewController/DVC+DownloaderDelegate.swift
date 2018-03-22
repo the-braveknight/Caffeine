@@ -34,4 +34,10 @@ extension DownloadsViewController: DownloaderDelegate {
             self.updateLabels()
         }
     }
+    
+    func downloader(_ downloader: MXDownloader, failedToDownloadFileAt url: URL?, withError error: Error) {
+        DispatchQueue.main.async {
+            self.handle(error: error)
+        }
+    }
 }

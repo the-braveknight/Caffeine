@@ -33,16 +33,16 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         self.sessionIdentifier = sessionIdentifier
     }
     
-    typealias CompletionHandler = (MXDownload?, Error?) -> Void
+    typealias CompletionHandler = (MXDownload) -> Void
     
     func downloadFile(at url: URL, as fileName: String? = nil, handler: CompletionHandler? = nil) {
         guard downloads[url] == nil else {
-            handler?(nil, Error.alreadyInProgress)
+            delegate?.downloader(self, failedToDownloadFileAt: url, withError: Error.alreadyInProgress)
             return
         }
         
         guard UIApplication.shared.canOpenURL(url) else {
-            handler?(nil, Error.unsupportedUrl)
+            delegate?.downloader(self, failedToDownloadFileAt: url, withError: Error.unsupportedUrl)
             return
         }
         
@@ -52,7 +52,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         }
         downloads.append(download)
         download.resume()
-        handler?(download, nil)
+        handler?(download)
         delegate?.downloader(self, didStartDownloading: download)
     }
     
@@ -98,7 +98,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
             }
             
             // Should not be needed, but just in case
-            if download.state == .waiting || download.state == .suspended {
+            if download.state != .running {
                 download.state = .running
             }
             

@@ -134,11 +134,7 @@ class DownloadsViewController: UITableViewController {
         
         let addDownload = UIAlertAction(title: "Add", style: .default) { (action) in
             let urlString = alertController.textFields!.first!.text!
-            self.downloader.downloadFile(at: urlString) { [weak self] (download, error) in
-                if let error = error {
-                    self?.handle(error: error)
-                }
-            }
+            self.downloader.downloadFile(at: urlString)
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
@@ -179,11 +175,11 @@ class DownloadsViewController: UITableViewController {
 }
 
 extension MXDownloader {
-    func downloadFile(at urlString: String, as fileName: String? = nil, completion: CompletionHandler? = nil) {
+    func downloadFile(at urlString: String, as fileName: String? = nil, handler: CompletionHandler? = nil) {
         guard let url = URL(string: urlString) else {
-            completion?(nil, Error.invalidUrl)
+            delegate?.downloader(self, failedToDownloadFileAt: nil, withError: Error.invalidUrl)
             return
         }
-        downloadFile(at: url, as: fileName, handler: completion)
+        downloadFile(at: url, as: fileName, handler: handler)
     }
 }

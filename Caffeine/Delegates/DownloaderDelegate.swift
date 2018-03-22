@@ -12,4 +12,5 @@ protocol DownloaderDelegate: class {
     func downloader(_ downloader: MXDownloader, didStartDownloading download: Download)
     func downloader(_ downloader: MXDownloader, didFinishDownloading download: Download, as file: LocalFile)
     func downloader(_ downloader: MXDownloader, failedToDownload download: Download, withError error: Error)
+    func downloader(_ downloader: MXDownloader, failedToDownloadFileAt url: URL?, withError error: Error)
 }
