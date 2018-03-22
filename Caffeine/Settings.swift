@@ -71,7 +71,10 @@ struct Settings {
         }
         
         var tableViewSeperatorColor: UIColor? {
-            return cellColor
+            switch self {
+            case .normal: return .groupTableViewBackground
+            case .dark: return .black
+            }
         }
         
         var statusBarStyle: UIStatusBarStyle {
