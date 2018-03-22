@@ -91,6 +91,7 @@ class DownloadsViewController: UITableViewController {
     
     @objc func updateColorMode() {
         UIApplication.shared.statusBarStyle = Settings.colorMode.statusBarStyle
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = Settings.colorMode.searchBarTextAttributes
         tabBarController?.tabBar.tintColor = Settings.colorMode.tintColor
         tabBarController?.tabBar.barTintColor = Settings.colorMode.barTintColor
         
@@ -102,10 +103,10 @@ class DownloadsViewController: UITableViewController {
         navigationController?.navigationBar.largeTitleTextAttributes = Settings.colorMode.textAttributes
         
         searchController.searchBar.keyboardAppearance = Settings.colorMode.keyboardAppearance
-        
-        noDownloadsLabel.textColor = Settings.colorMode.textColor
         searchController.searchBar.tintColor = Settings.colorMode.tintColor
         
+        noDownloadsLabel.textColor = Settings.colorMode.textColor
+
         tableView.backgroundColor = Settings.colorMode.tableViewColor
         tableView.visibleCells.compactMap { $0 as? DownloadCell }.forEach(updateCellUI)
         

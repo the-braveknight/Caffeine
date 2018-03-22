@@ -84,6 +84,10 @@ struct Settings {
         var textAttributes: [NSAttributedStringKey : Any] {
             return [.foregroundColor : textColor]
         }
+        
+        var searchBarTextAttributes: [String : Any] {
+            return [NSAttributedStringKey.foregroundColor.rawValue : textColor]
+        }
     }
     
     static var colorMode: ColorMode {
