@@ -15,6 +15,12 @@ protocol LocalFile: File {
 }
 
 extension LocalFile {
+    var name: String {
+        return url.lastPathComponent
+    }
+}
+
+extension LocalFile {
     var stillExists: Bool {
         return FileManager.default.fileExists(atPath: url.path)
     }

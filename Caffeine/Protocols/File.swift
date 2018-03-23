@@ -41,13 +41,10 @@ enum FileType {
 
 protocol File {
     var url: URL { get }
+    var name: String { get }
 }
 
 extension File {
-    var name: String {
-        return url.lastPathComponent
-    }
-    
     var type: FileType {
         return FileType(fileExtension: name.fileExtension)
     }

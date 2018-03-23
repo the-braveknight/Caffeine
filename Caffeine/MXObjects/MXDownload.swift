@@ -47,12 +47,12 @@ class MXDownload: Download {
     // If this returns false, the URLSession delegate methods will
     // try to set the fileName to response.suggestedFilename.
     var fileNameWasSet: Bool {
-        return fileName != url.lastPathComponent
+        return name != url.lastPathComponent
     }
     
-    var fileName: String {
+    var name: String {
         didSet {
-            delegate?.download(self, didFetchFileName: fileName)
+            delegate?.download(self, didFetchFileName: name)
         }
     }
     
@@ -61,13 +61,13 @@ class MXDownload: Download {
     required init(url: URL, session: URLSession, resumeData: Data) {
         self.url = url
         self.task = session.downloadTask(withResumeData: resumeData)
-        self.fileName = url.lastPathComponent
+        self.name = url.lastPathComponent
     }
     
     required init(url: URL, session: URLSession) {
         self.url = url
         self.task = session.downloadTask(with: url)
-        self.fileName = url.lastPathComponent
+        self.name = url.lastPathComponent
     }
     
     func pause() {

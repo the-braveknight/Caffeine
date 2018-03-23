@@ -48,7 +48,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         
         let download = MXDownload(url: url, session: session)
         if let fileName = fileName {
-            download.fileName = fileName
+            download.name = fileName
         }
         downloads.append(download)
         download.resume()
@@ -78,11 +78,10 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Swift.Error?) {
         guard let error = error as NSError? else { return }
-        guard let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL else { return }
-        guard let download = downloads[url] else { return }
+        guard let download = downloads[task] else { return }
         
-        // Notify delegate if an active download (state == .running) encounters an unexpected error
         if download.state == .running {
+            // Notify delegate if an active download (state == .running) encounters an unexpected error
             delegate?.downloader(self, failedToDownload: download, withError: error)
             try? downloads.remove(download)
         } else if download.state == .canceling {
@@ -91,35 +90,29 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        if let url = downloadTask.response?.url, let download = downloads[url] {            
-            if let suggestedFilename = downloadTask.response?.suggestedFilename, !download.fileNameWasSet, download.fileName != suggestedFilename {
-                download.fileName = suggestedFilename
-            }
-            
-            // Should not be needed, but just in case
-            if download.state != .running {
-                download.state = .running
-            }
-            
-            if download.progress.isInitial {
-                download.progress.totalBytes = totalBytesExpectedToWrite
-            }
-            download.progress.bytesReceived = totalBytesWritten
+        guard let download = downloads[downloadTask] else { return }
+        if let suggestedFilename = downloadTask.response?.suggestedFilename, !download.fileNameWasSet, download.name != suggestedFilename {
+            download.name = suggestedFilename
         }
+        
+        if download.progress.isInitial {
+            download.progress.totalBytes = totalBytesExpectedToWrite
+        }
+        download.progress.bytesReceived = totalBytesWritten
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        if let url = downloadTask.response?.url, let download = downloads[url] {
-            download.state = .completed
-            
-            try? downloads.remove(download)
-            
-            MXFile.saveItem(at: location, fileName: download.fileName) { (file, error) in
-                if let file = file {
-                    self.delegate?.downloader(self, didFinishDownloading: download, as: file)
-                } else if let error = error {
-                    self.delegate?.downloader(self, failedToDownload: download, withError: error)
-                }
+        guard let download = downloads[downloadTask] else { return }
+        
+        download.state = .completed
+        
+        try? downloads.remove(download)
+        
+        MXFile.saveItem(at: location, fileName: download.name) { (file, error) in
+            if let file = file {
+                self.delegate?.downloader(self, didFinishDownloading: download, as: file)
+            } else if let error = error {
+                self.delegate?.downloader(self, failedToDownload: download, withError: error)
             }
         }
     }
@@ -143,16 +136,20 @@ extension MXDownload: Equatable {
 
 extension Array where Element: Equatable {
     enum Error: Swift.Error {
-        case indexOutOfRange
+        case invalidIndex
     }
     
     mutating func remove(_ item: Element) throws {
-        guard let index = index(of: item) else { throw Error.indexOutOfRange }
+        guard let index = index(of: item) else { throw Error.invalidIndex }
         remove(at: index)
     }
 }
 
 extension Array where Element == MXDownload {
+    subscript (_ task: URLSessionTask) -> MXDownload? {
+        return first { $0.task == task }
+    }
+    
     subscript (_ url: URL) -> MXDownload? {
         return first { $0.url == url }
     }
