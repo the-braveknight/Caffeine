@@ -142,7 +142,7 @@ class DownloadsViewController: UITableViewController {
         
         alertController.addAction(addDownload)
         alertController.addAction(cancelAction)
-        self.present(alertController, animated: true)
+        present(alertController, animated: true)
     }
     
     @objc func handleButtonPress(button: UIButton) {

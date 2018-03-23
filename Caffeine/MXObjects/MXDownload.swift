@@ -23,11 +23,6 @@ class MXDownload: Download {
         }
     }
     
-    enum Error: Swift.Error {
-        case invalidTask
-        case taskError
-    }
-    
     let url: URL
     let task: URLSessionDownloadTask
     
@@ -68,6 +63,11 @@ class MXDownload: Download {
         self.url = url
         self.task = session.downloadTask(with: url)
         self.name = url.lastPathComponent
+    }
+    
+    convenience init?(task: URLSessionDownloadTask, session: URLSession) {
+        guard let url = task.response?.url, let error = task.error as NSError?, let resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData] as? Data else { return nil }
+        self.init(url: url, session: session, resumeData: resumeData)
     }
     
     func pause() {

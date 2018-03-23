@@ -64,12 +64,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     
     private func backgroundDownloads(handler: @escaping ([MXDownload]) -> Void) {
         session.getTasksWithCompletionHandler { [unowned self] (dataTasks, uploadTasks, downloadTasks) in
-            let downloads: [MXDownload] = downloadTasks.compactMap { downloadTask in
-                if let url = downloadTask.response?.url, let error = downloadTask.error as NSError?, let resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-                    return MXDownload(url: url, session: self.session, resumeData: resumeData)
-                }
-                return nil
-            }
+            let downloads = downloadTasks.compactMap { MXDownload(task: $0, session: self.session ) }
             handler(downloads)
         }
     }
@@ -145,12 +140,12 @@ extension Array where Element: Equatable {
     }
 }
 
-extension Array where Element == MXDownload {
-    subscript (_ task: URLSessionTask) -> MXDownload? {
+extension Array where Element : Download {
+    subscript (_ task: URLSessionTask) -> Element? {
         return first { $0.task == task }
     }
     
-    subscript (_ url: URL) -> MXDownload? {
+    subscript (_ url: URL) -> Element? {
         return first { $0.url == url }
     }
 }
