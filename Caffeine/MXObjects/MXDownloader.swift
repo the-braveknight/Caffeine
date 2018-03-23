@@ -78,14 +78,16 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Swift.Error?) {
         guard let error = error as NSError? else { return }
-        guard let url = task.response?.url ?? error.userInfo[NSURLErrorFailingURLErrorKey] as? URL else { return }
+        guard let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL else { return }
         guard let download = downloads[url] else { return }
         
         // Notify delegate if an active download (state == .running) encounters an unexpected error
         if download.state == .running {
             delegate?.downloader(self, failedToDownload: download, withError: error)
+            try? downloads.remove(download)
+        } else if download.state == .canceling {
+            try? downloads.remove(download)
         }
-        try? downloads.remove(download)
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
