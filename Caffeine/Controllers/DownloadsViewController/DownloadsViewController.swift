@@ -58,7 +58,6 @@ class DownloadsViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         downloader.delegate = self
-        downloader.loadUnfinishedDownloads()
         
         view.addSubview(noDownloadsLabel)
         noDownloadsLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor).isActive = true
@@ -155,8 +154,7 @@ class DownloadsViewController: UITableViewController {
     }
     
     func handle(error: Error) {
-        let errorMessage = (error as? MXDownloader.Error)?.localizedDescription ?? error.localizedDescription
-        let alertController = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         let action = UIAlertAction(title: "Dismiss", style: .cancel)
         alertController.addAction(action)
         present(alertController, animated: true)

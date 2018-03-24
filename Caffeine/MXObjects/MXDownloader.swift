@@ -31,6 +31,11 @@ class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
     
     init(sessionIdentifier: String) {
         self.sessionIdentifier = sessionIdentifier
+        super.init()
+        
+        backgroundDownloads { (downloads) in
+            self.downloads.append(contentsOf: downloads)
+        }
     }
     
     func downloadFile(at url: URL, as fileName: String? = nil) {
@@ -48,12 +53,6 @@ class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
         downloads.append(download)
         download.resume()
         delegate?.downloader(self, didStartDownloading: download)
-    }
-    
-    func loadUnfinishedDownloads() {
-        backgroundDownloads { (downloads) in
-            self.downloads.append(contentsOf: downloads)
-        }
     }
     
     private func backgroundDownloads(handler: @escaping ([MXDownload]) -> Void) {
@@ -107,8 +106,8 @@ class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
     }
 }
 
-extension MXDownloader.Error {
-    var localizedDescription: String {
+extension MXDownloader.Error: LocalizedError {
+    var errorDescription: String? {
         switch self {
         case .invalidUrl: return "Invalid URL address. Please make sure you're typing the address correctly."
         case .unsupportedUrl: return "Unsupported URL address. Your device cannot open this type of URLs."
