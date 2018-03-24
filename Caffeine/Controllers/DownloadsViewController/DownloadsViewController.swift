@@ -15,7 +15,7 @@ extension Download {
 }
 
 class DownloadsViewController: UITableViewController {
-    let downloader: MXDownloader
+    let downloader: Downloader
     
     var filteredDownloads = [Download]()
     
@@ -45,7 +45,7 @@ class DownloadsViewController: UITableViewController {
     
     let cellId = "DownloadCell"
     
-    init(downloader: MXDownloader) {
+    init(downloader: Downloader) {
         self.downloader = downloader
         super.init(style: .grouped)
     }
@@ -173,12 +173,22 @@ class DownloadsViewController: UITableViewController {
     }
 }
 
-extension MXDownloader {
+extension Downloader {
     func downloadFile(at urlString: String, as fileName: String? = nil) {
         guard let url = URL(string: urlString) else {
             delegate?.downloader(self, didFailToDownloadFileAt: nil, withError: Error.invalidUrl)
             return
         }
         downloadFile(at: url, as: fileName)
+    }
+}
+
+extension Downloader.Error: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .invalidUrl: return "Invalid URL address. Please make sure you're typing the address correctly."
+        case .unsupportedUrl: return "Unsupported URL address. Your device cannot open this type of URLs."
+        case .alreadyInProgress: return "Download already in progress."
+        }
     }
 }

@@ -8,13 +8,7 @@
 
 import UIKit
 
-class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
-    enum Error: Swift.Error {
-        case invalidUrl
-        case unsupportedUrl
-        case alreadyInProgress
-    }
-    
+class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {    
     static let shared = MXDownloader(sessionIdentifier: "com.zrahawi.mx-downloader")
     
     private(set) var downloads = [Download]()
@@ -102,16 +96,6 @@ class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
             } else if let error = error {
                 self.delegate?.downloader(self, download: download, didFailWithError: error)
             }
-        }
-    }
-}
-
-extension MXDownloader.Error: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-        case .invalidUrl: return "Invalid URL address. Please make sure you're typing the address correctly."
-        case .unsupportedUrl: return "Unsupported URL address. Your device cannot open this type of URLs."
-        case .alreadyInProgress: return "Download already in progress."
         }
     }
 }

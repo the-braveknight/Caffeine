@@ -8,7 +8,14 @@
 
 import Foundation
 
+enum DownloaderError: Error {
+    case invalidUrl
+    case unsupportedUrl
+    case alreadyInProgress
+}
+
 protocol Downloader: class {
+    typealias Error = DownloaderError
     var session: URLSession { get }
     var downloads: [Download] { get }
     var delegate: DownloaderDelegate? { get set }

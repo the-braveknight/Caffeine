@@ -44,7 +44,6 @@ protocol Download: class {
     typealias State = DownloadState
     var url: URL { get }
     var name: String { get }
-    var icon: UIImage { get }
     var downloader: Downloader { get }
     var progress: Progress { get }
     var state: DownloadState { get }
@@ -60,7 +59,9 @@ extension Download {
     var shouldSetFileName: Bool {
         return url.lastPathComponent == name
     }
-    
+}
+
+extension Download {
     var fileType: FileType {
         return FileType(fileExtension: name.fileExtension)
     }
