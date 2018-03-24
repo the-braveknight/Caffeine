@@ -17,9 +17,9 @@ extension Download {
 class DownloadsViewController: UITableViewController {
     let downloader: MXDownloader
     
-    var filteredDownloads = [MXDownload]()
+    var filteredDownloads = [Download]()
     
-    var downloads: [MXDownload] {
+    var downloads: [Download] {
         let downloads = isSearching ? filteredDownloads : downloader.downloads
         let activeDownloads = downloads.filter { $0.isActive }
         return activeDownloads
@@ -176,11 +176,11 @@ class DownloadsViewController: UITableViewController {
 }
 
 extension MXDownloader {
-    func downloadFile(at urlString: String, as fileName: String? = nil, handler: CompletionHandler? = nil) {
+    func downloadFile(at urlString: String, as fileName: String? = nil) {
         guard let url = URL(string: urlString) else {
-            delegate?.downloader(self, failedToDownloadFileAt: nil, withError: Error.invalidUrl)
+            delegate?.downloader(self, didFailToDownloadFileAt: nil, withError: Error.invalidUrl)
             return
         }
-        downloadFile(at: url, as: fileName, handler: handler)
+        downloadFile(at: url, as: fileName)
     }
 }

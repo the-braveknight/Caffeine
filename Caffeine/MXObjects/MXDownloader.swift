@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXDownloader: NSObject, URLSessionDownloadDelegate {
+class MXDownloader: NSObject, Downloader, URLSessionDownloadDelegate {
     enum Error: Swift.Error {
         case invalidUrl
         case unsupportedUrl
@@ -17,7 +17,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     
     static let shared = MXDownloader(sessionIdentifier: "com.zrahawi.mx-downloader")
     
-    private(set) var downloads = [MXDownload]()
+    private(set) var downloads = [Download]()
     
     weak var delegate: DownloaderDelegate?
     
@@ -33,26 +33,20 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         self.sessionIdentifier = sessionIdentifier
     }
     
-    typealias CompletionHandler = (MXDownload) -> Void
-    
-    func downloadFile(at url: URL, as fileName: String? = nil, handler: CompletionHandler? = nil) {
+    func downloadFile(at url: URL, as fileName: String? = nil) {
         guard downloads[url] == nil else {
-            delegate?.downloader(self, failedToDownloadFileAt: url, withError: Error.alreadyInProgress)
+            delegate?.downloader(self, didFailToDownloadFileAt: url, withError: Error.alreadyInProgress)
             return
         }
         
         guard UIApplication.shared.canOpenURL(url) else {
-            delegate?.downloader(self, failedToDownloadFileAt: url, withError: Error.unsupportedUrl)
+            delegate?.downloader(self, didFailToDownloadFileAt: url, withError: Error.unsupportedUrl)
             return
         }
         
-        let download = MXDownload(url: url, session: session)
-        if let fileName = fileName {
-            download.name = fileName
-        }
+        let download = MXDownload(url: url, downloader: self, fileName: fileName)
         downloads.append(download)
         download.resume()
-        handler?(download)
         delegate?.downloader(self, didStartDownloading: download)
     }
     
@@ -64,7 +58,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     
     private func backgroundDownloads(handler: @escaping ([MXDownload]) -> Void) {
         session.getTasksWithCompletionHandler { [unowned self] (dataTasks, uploadTasks, downloadTasks) in
-            let downloads = downloadTasks.compactMap { MXDownload(task: $0, session: self.session ) }
+            let downloads = downloadTasks.compactMap { MXDownload(task: $0, downloader: self) }
             handler(downloads)
         }
     }
@@ -77,7 +71,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         
         if download.state == .running {
             // Notify delegate if an active download (state == .running) encounters an unexpected error
-            delegate?.downloader(self, failedToDownload: download, withError: error)
+            delegate?.downloader(self, download: download, didFailWithError: error)
             try? downloads.remove(download)
         } else if download.state == .canceling {
             try? downloads.remove(download)
@@ -85,8 +79,8 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard let download = downloads[downloadTask] else { return }
-        if let suggestedFilename = downloadTask.response?.suggestedFilename, !download.fileNameWasSet, download.name != suggestedFilename {
+        guard let download = downloads[downloadTask] as? MXDownload else { return }
+        if let suggestedFilename = downloadTask.response?.suggestedFilename, download.shouldSetFileName, download.name != suggestedFilename {
             download.name = suggestedFilename
         }
         
@@ -97,7 +91,7 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        guard let download = downloads[downloadTask] else { return }
+        guard let download = downloads[downloadTask] as? MXDownload else { return }
         
         download.state = .completed
         
@@ -105,9 +99,9 @@ class MXDownloader: NSObject, URLSessionDownloadDelegate {
         
         MXFile.saveItem(at: location, fileName: download.name) { (file, error) in
             if let file = file {
-                self.delegate?.downloader(self, didFinishDownloading: download, as: file)
+                self.delegate?.downloader(self, didFinishDownloading: download, asFile: file)
             } else if let error = error {
-                self.delegate?.downloader(self, failedToDownload: download, withError: error)
+                self.delegate?.downloader(self, download: download, didFailWithError: error)
             }
         }
     }
@@ -123,24 +117,20 @@ extension MXDownloader.Error {
     }
 }
 
-extension MXDownload: Equatable {
-    static func ==(lhs: MXDownload, rhs: MXDownload) -> Bool {
-        return lhs.url == rhs.url
-    }
-}
-
-extension Array where Element: Equatable {
+extension Array where Element == Download {
     enum Error: Swift.Error {
         case invalidIndex
     }
     
+    func index(of element: Element) -> Index? {
+        return index { $0.url == element.url }
+    }
+    
     mutating func remove(_ item: Element) throws {
-        guard let index = index(of: item) else { throw Error.invalidIndex }
+        guard let index = index(where: { item === $0 }) else { throw Error.invalidIndex }
         remove(at: index)
     }
-}
-
-extension Array where Element : Download {
+    
     subscript (_ task: URLSessionTask) -> Element? {
         return first { $0.task == task }
     }

@@ -38,7 +38,7 @@ extension DownloadsViewController {
         updateCellUI(cell)
     }
     
-    func download(forRowAt indexPath: IndexPath) -> MXDownload {
+    func download(forRowAt indexPath: IndexPath) -> Download {
         return downloads[indexPath.row]
     }
     
@@ -47,7 +47,6 @@ extension DownloadsViewController {
         cell.download = download
         cell.button.tag = indexPath.row
         cell.button.addTarget(self, action: #selector(handleButtonPress), for: .touchUpInside)
-        download.delegate = self
         cell.imageView?.image = download.icon.withRenderingMode(.alwaysTemplate)
         cell.nameLabel.text = download.name
         cell.button.isSelected = download.state == .running

@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct MXFile: LocalFile {
+struct MXFile: File {
     let url: URL
     
     static var filesDirectory: URL {

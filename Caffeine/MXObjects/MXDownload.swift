@@ -9,65 +9,44 @@
 import Foundation
 
 class MXDownload: Download {
-    struct Progress: DownloadProgress {
-        var totalBytes: Int64
-        var bytesReceived: Int64 = 0
-        var startDate = Date()
-        
-        init(totalBytes: Int64) {
-            self.totalBytes = totalBytes
-        }
-        
-        init() {
-            self.init(totalBytes: 0)
-        }
-    }
-    
     let url: URL
     let task: URLSessionDownloadTask
     
-    var state: DownloadState = .waiting {
+    var state: State = .waiting {
         didSet {
-            delegate?.download(self, didUpdateState: state)
+            downloader.delegate?.downloader(downloader, download: self, didUpdateState: state)
         }
     }
     
-    var progress: DownloadProgress = Progress() {
+    var progress = Progress() {
         // Progress must be value type (Struct) in order for this call to happen
         didSet {
-            delegate?.download(self, didUpdateProgress: progress)
+            downloader.delegate?.downloader(downloader, download: self, didUpdateProgress: progress)
         }
-    }
-    
-    // If this returns false, the URLSession delegate methods will
-    // try to set the fileName to response.suggestedFilename.
-    var fileNameWasSet: Bool {
-        return name != url.lastPathComponent
     }
     
     var name: String {
         didSet {
-            delegate?.download(self, didFetchFileName: name)
+            downloader.delegate?.downloader(downloader, download: self, didUpdateFileName: name)
         }
     }
     
-    weak var delegate: DownloadDelegate?
+    unowned var downloader: Downloader
     
-    required init(url: URL, session: URLSession, resumeData: Data) {
+    init(url: URL, downloader: Downloader, resumeData: Data? = nil, fileName: String? = nil) {
         self.url = url
-        self.task = session.downloadTask(withResumeData: resumeData)
-        self.name = url.lastPathComponent
+        self.downloader = downloader
+        self.name = fileName ?? url.lastPathComponent
+        if let resumeData = resumeData {
+            self.task = downloader.session.downloadTask(withResumeData: resumeData)
+        } else {
+            self.task = downloader.session.downloadTask(with: url)
+        }
     }
     
-    required init(url: URL, session: URLSession) {
-        self.url = url
-        self.task = session.downloadTask(with: url)
-        self.name = url.lastPathComponent
-    }
-    
-    convenience init?(task: URLSessionDownloadTask, session: URLSession) {
+    convenience init?(task: URLSessionDownloadTask, downloader: Downloader, fileName: String? = nil) {
         guard let url = task.response?.url, let error = task.error as NSError?, let resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData] as? Data else { return nil }
-        self.init(url: url, session: session, resumeData: resumeData)
+        self.init(url: url, downloader: downloader, resumeData: resumeData, fileName: fileName)
     }
     
     func pause() {
