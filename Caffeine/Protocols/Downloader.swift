@@ -15,9 +15,12 @@ enum DownloaderError: Error {
 }
 
 protocol Downloader: class {
-    typealias Error = DownloaderError
     var session: URLSession { get }
     var downloads: [Download] { get }
     var delegate: DownloaderDelegate? { get set }
     func downloadFile(at url: URL, as fileName: String?)
+}
+
+extension Downloader {
+    typealias Error = DownloaderError
 }

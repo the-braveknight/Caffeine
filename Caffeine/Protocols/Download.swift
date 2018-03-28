@@ -40,8 +40,6 @@ struct DownloadProgress {
 }
 
 protocol Download: class {
-    typealias Progress = DownloadProgress
-    typealias State = DownloadState
     var url: URL { get }
     var name: String { get }
     var downloader: Downloader { get }
@@ -52,6 +50,11 @@ protocol Download: class {
     func resume()
     func pause()
     func cancel()
+}
+
+extension Download {
+    typealias Progress = DownloadProgress
+    typealias State = DownloadState
 }
 
 // Default implementation

@@ -183,7 +183,7 @@ extension Downloader {
     }
 }
 
-extension Downloader.Error: LocalizedError {
+extension DownloaderError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidUrl: return "Invalid URL address. Please make sure you're typing the address correctly."
