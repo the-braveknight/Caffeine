@@ -89,7 +89,7 @@ class DownloadsViewController: UITableViewController {
     }
     
     @objc func updateColorMode() {
-        UIApplication.shared.statusBarStyle = Settings.colorMode.statusBarStyle
+        navigationController?.navigationBar.barStyle = Settings.colorMode.barStyle
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = Settings.colorMode.searchBarTextAttributes
         tabBarController?.tabBar.tintColor = Settings.colorMode.tintColor
         tabBarController?.tabBar.barTintColor = Settings.colorMode.barTintColor
@@ -97,7 +97,6 @@ class DownloadsViewController: UITableViewController {
         editButtonItem.tintColor = Settings.colorMode.tintColor
         addButton.tintColor = Settings.colorMode.tintColor
         
-        navigationController?.navigationBar.barTintColor = Settings.colorMode.barTintColor
         navigationController?.navigationBar.titleTextAttributes = Settings.colorMode.textAttributes
         navigationController?.navigationBar.largeTitleTextAttributes = Settings.colorMode.textAttributes
         

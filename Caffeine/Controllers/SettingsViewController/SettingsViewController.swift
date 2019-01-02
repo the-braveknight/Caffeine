@@ -34,7 +34,7 @@ class SettingsViewController: UITableViewController {
     }
     
     @objc func updateColorMode() {
-        navigationController?.navigationBar.barTintColor = Settings.colorMode.barTintColor
+        navigationController?.navigationBar.barStyle = Settings.colorMode.barStyle
         navigationController?.navigationBar.titleTextAttributes = Settings.colorMode.textAttributes
         navigationController?.navigationBar.largeTitleTextAttributes = Settings.colorMode.textAttributes
         

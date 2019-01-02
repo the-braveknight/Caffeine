@@ -63,7 +63,7 @@ class FileBrowserViewController: UITableViewController {
     @objc func updateColorMode() {
         editButtonItem.tintColor = Settings.colorMode.tintColor
         
-        navigationController?.navigationBar.barTintColor = Settings.colorMode.barTintColor
+        navigationController?.navigationBar.barStyle = Settings.colorMode.barStyle
         navigationController?.navigationBar.titleTextAttributes = Settings.colorMode.textAttributes
         navigationController?.navigationBar.largeTitleTextAttributes = Settings.colorMode.textAttributes
         

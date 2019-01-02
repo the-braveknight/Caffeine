@@ -77,10 +77,10 @@ struct Settings {
             }
         }
         
-        var statusBarStyle: UIStatusBarStyle {
+        var barStyle: UIBarStyle {
             switch self {
             case .normal: return .default
-            case .dark: return .lightContent
+            case .dark: return .black
             }
         }
         
