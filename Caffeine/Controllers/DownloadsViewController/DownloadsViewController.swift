@@ -132,7 +132,7 @@ class DownloadsViewController: UITableViewController {
         }
         
         let addDownload = UIAlertAction(title: "Add", style: .default) { (action) in
-            let urlString = alertController.textFields!.first!.text!
+            let urlString = alertController.textFields!.first!.text!.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics.union(.urlPathAllowed).union(.urlHostAllowed))!
             self.downloader.downloadFile(at: urlString)
         }
         

@@ -93,6 +93,8 @@ class FileBrowserViewController: UITableViewController {
     @objc func share(sender: UIButton) {
         let file = files[sender.tag]
         let activityController = UIActivityViewController(activityItems: [file.url], applicationActivities: nil)
+        activityController.popoverPresentationController?.sourceView = sender
+        activityController.popoverPresentationController?.sourceRect = sender.bounds
         present(activityController, animated: true)
     }
     

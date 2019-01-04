@@ -61,7 +61,6 @@ class DownloadCell: UITableViewCell {
         nameLabel.trailingAnchor.constraint(equalTo: button.leadingAnchor, constant: -14).isActive = true
         nameLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
         
-        progressLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         progressLabel.leadingAnchor.constraint(equalTo: imageView!.trailingAnchor, constant: 14).isActive = true
         progressLabel.bottomAnchor.constraint(equalTo: progressBar.topAnchor, constant: -2).isActive = true
         progressLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
